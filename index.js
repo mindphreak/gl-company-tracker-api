@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // routes
-app.use("/api/products", companyRoute);
+app.use("/api/companies", companyRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello from Node API");
