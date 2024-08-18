@@ -1,36 +1,32 @@
-var Express = require("express");
-var cors = require("cors");
-const { MongoClient } = require("mongodb");
-
-var app = Express();
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const Company = require("./models/company.model");
+const companyRoute = require("./routes/company.route.js");
+const app = express();
 app.use(cors());
 
-async function run() {
-  const uri =
-    "mongodb+srv://mindphreak:GlassLewis123@cluster0.f1rts.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
-  const client = new MongoClient(uri);
+// middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-  await client.connect();
+// routes
+app.use("/api/products", companyRoute);
 
-  const dbName = "glcompanydb";
-  const collectionName = "companycollection";
-  const database = client.db(dbName);
-  const collection = database.collection(collectionName);
+app.get("/", (req, res) => {
+  res.send("Hello from Node API");
+});
 
-  const findQuery = {};
-
-  try {
-    const cursor = await collection.find(findQuery).sort({ name: 1 });
-    for await (const company of cursor) {
-      console.log(company.name);
-    }
-  } catch (err) {
-    console.error(
-      `Something went wrong trying to find the documents: ${err}\n`
-    );
-  }
-
-  await client.close();
-}
-
-run().catch(console.dir);
+mongoose
+  .connect(
+    "mongodb+srv://mindphreak:GlassLewis123@cluster0.f1rts.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  )
+  .then(() => {
+    console.log("Connected to MongoDB!");
+    app.listen(3000, () => {
+      console.log("Server is running on port: 3000");
+    });
+  })
+  .catch(() => {
+    console.log("MongoDB connection failed!");
+  });
